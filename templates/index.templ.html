@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<script src="./static/htmx.js"></script>
+	<meta property="og:type" content="website">
+	<meta property="og:url" content="{{ .url }}">
+	<meta property="og:title" content="the greatest pong ever">
+	<meta property="og:description"
+		content="within this page you will experience the greatness brought into this world by the dynamic duo of nathaniel p maile and some other guy">
+	<style>
+		:root {
+			color-scheme: light dark;
+		}
+
+		.gameObject {}
+
+		.paddl {}
+
+		.paddr {}
+
+		.ball {}
+	</style>
+	<style class="game">
+
+	</style>
+</head>
+
+<body>
+	<div class="screen" hx-get="/gameupdate" hx-target=".game">
+		<div class="gameObject paddl">
+		</div>
+		<div class="gameObject paddr">
+		</div>
+		<div class="gameObject ball">
+		</div>
+	</div>
+</body>
+
+</html>
