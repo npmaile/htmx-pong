@@ -14,8 +14,8 @@ type GameStateSingleton struct {
 
 func Init() GameStateSingleton {
 	return GameStateSingleton{
-		games: make(map[string]*Game),
-		NewGameRequests: make(chan NewGameRequest),
+		games:              make(map[string]*Game),
+		NewGameRequests:    make(chan NewGameRequest),
 		GameUpdateRequests: make(chan GameUpdateRequest),
 	}
 }
@@ -37,7 +37,6 @@ type GameUpdateRequest struct {
 
 func (gss *GameStateSingleton) StartProcessing() {
 	for {
-		fmt.Println("listening for requests")
 		select {
 		case req := <-gss.NewGameRequests:
 			fmt.Println("got new game request")

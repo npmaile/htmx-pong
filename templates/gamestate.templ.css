@@ -1,28 +1,3 @@
-/*
-{{.Ball.Loc.X}}
-{{.Ball.Loc.Y}}
-{{.Paddl.Y}}
-{{.Paddl.Height}}
-{{.PaddR.Height}}
-{{.ScoreL}}
-{{.ScoreR}}
-{{.Completed}}
-*/
-
-.paddl{
-	top: {{.Paddl.Y}}%;
-	translateY: -50%;
-}
-
-.paddR{
-
-	top: {{.Paddl.Y}}%;
-	translateY: -50%;
-}
-
-.ball{
-	top: {{.Ball.Loc.Y}}%;
-	translateY: -50%;
-	left: {{.Ball.Loc.X}}%;
-	translateX: -50%;
-}
+.l{top:{{.Paddl.Y}}%;}
+.r{top:{{.Paddl.Y}}%;}
+.b{top:{{.Ball.Loc.Y}}%;left:{{.Ball.Loc.X}}%;}

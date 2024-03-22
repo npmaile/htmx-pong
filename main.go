@@ -63,7 +63,6 @@ func updateFunc(gs gamestate.GameStateSingleton) func(w http.ResponseWriter, r *
 			A:  0,
 		}
 		a := <-ch
-		fmt.Printf("got: %+v", a)
 		err := templates.ExecuteTemplate(w, "gamestate.templ.css", a)
 		if err != nil {
 			panic(err)

@@ -6,7 +6,7 @@ import (
 )
 
 const inputScaling float64 = 1.0
-const timeScaling float64 = 0.1
+const timeScaling float64 = 0.0000000001
 
 type vec2 struct {
 	X float64
@@ -81,11 +81,12 @@ func (g *Game) play(action Action) {
 	g.Ball.Loc.Y += g.Ball.Speed.Y * delta
 
 	// calculate ceiling/floor collisions
-	if math.Abs(g.Ball.Loc.Y) >= 100.0 {
+	if math.Abs(g.Ball.Loc.Y -50) >= 50 {
 		g.Ball.Speed.Y *= -1
 	}
 
 	// calculate paddle collisions
-	if math.Abs(g.Ball.Loc.X) >= 99.0 {
+	if math.Abs(g.Ball.Loc.X - 50) >= 49 {
+		g.Ball.Speed.X *= -1
 	}
 }
