@@ -40,6 +40,10 @@ func main() {
 	http.Handle("/static/", http.FileServerFS(staticFS))
 	http.HandleFunc("/", pong)
 	http.HandleFunc("/update", updateFunc(gs))
+	http.HandleFunc("/update/left/up", updateFuncLeftUp(gs))
+	http.HandleFunc("/update/left/down", updateFuncLeftDown(gs))
+	http.HandleFunc("/update/right/up", updateFuncRightUp(gs))
+	http.HandleFunc("/update/right/down", updateFuncRightDown(gs))
 	http.HandleFunc("/testkey", testkey)
 	fmt.Println("running on 8080")
 	http.ListenAndServe(":8080", nil)
@@ -60,7 +64,79 @@ func updateFunc(gs gamestate.GameStateSingleton) func(w http.ResponseWriter, r *
 		gs.GameUpdateRequests <- gamestate.GameUpdateRequest{
 			Ch: ch,
 			ID: id,
-			A:  0,
+			A:  gamestate.NoAction,
+		}
+		a := <-ch
+		err := templates.ExecuteTemplate(w, "gamestate.templ.css", a)
+		if err != nil {
+			panic(err)
+		}
+		// render the gamestate template to the thing
+	}
+}
+
+func updateFuncLeftUp(gs gamestate.GameStateSingleton) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// lookup the user
+		ch := make(chan gamestate.Game)
+		gs.GameUpdateRequests <- gamestate.GameUpdateRequest{
+			Ch: ch,
+			ID: id,
+			A:  gamestate.Lup,
+		}
+		a := <-ch
+		err := templates.ExecuteTemplate(w, "gamestate.templ.css", a)
+		if err != nil {
+			panic(err)
+		}
+		// render the gamestate template to the thing
+	}
+}
+
+func updateFuncLeftDown(gs gamestate.GameStateSingleton) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// lookup the user
+		ch := make(chan gamestate.Game)
+		gs.GameUpdateRequests <- gamestate.GameUpdateRequest{
+			Ch: ch,
+			ID: id,
+			A:  gamestate.Ldown,
+		}
+		a := <-ch
+		err := templates.ExecuteTemplate(w, "gamestate.templ.css", a)
+		if err != nil {
+			panic(err)
+		}
+		// render the gamestate template to the thing
+	}
+}
+
+func updateFuncRightUp(gs gamestate.GameStateSingleton) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// lookup the user
+		ch := make(chan gamestate.Game)
+		gs.GameUpdateRequests <- gamestate.GameUpdateRequest{
+			Ch: ch,
+			ID: id,
+			A:  gamestate.Rup,
+		}
+		a := <-ch
+		err := templates.ExecuteTemplate(w, "gamestate.templ.css", a)
+		if err != nil {
+			panic(err)
+		}
+		// render the gamestate template to the thing
+	}
+}
+
+func updateFuncRightDown(gs gamestate.GameStateSingleton) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		// lookup the user
+		ch := make(chan gamestate.Game)
+		gs.GameUpdateRequests <- gamestate.GameUpdateRequest{
+			Ch: ch,
+			ID: id,
+			A:  gamestate.Rdown,
 		}
 		a := <-ch
 		err := templates.ExecuteTemplate(w, "gamestate.templ.css", a)

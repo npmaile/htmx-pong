@@ -1,12 +1,13 @@
 package gamestate
 
 import (
+	"fmt"
 	"math"
 	"time"
 )
 
 const inputScaling float64 = 1.0
-const timeScaling float64 = 0.0000000001
+const timeScaling float64 = 0.00000001
 
 type vec2 struct {
 	X float64
@@ -14,8 +15,8 @@ type vec2 struct {
 }
 
 type ballstate struct {
-	Speed vec2
-	Loc   vec2
+	Speed *vec2
+	Loc   *vec2
 }
 
 type paddle struct {
@@ -26,9 +27,9 @@ type paddle struct {
 
 type Game struct {
 	Updated   time.Time
-	Ball      ballstate
-	PaddR     paddle
-	Paddl     paddle
+	Ball      *ballstate
+	PaddR     *paddle
+	Paddl     *paddle
 	ScoreL    int
 	ScoreR    int
 	Completed bool
@@ -36,13 +37,13 @@ type Game struct {
 
 func NewGame() *Game {
 	return &Game{
-		Ball: ballstate{Speed: vec2{X: 2, Y: 1}, Loc: vec2{X: 50, Y: 50}},
-		Paddl: paddle{
+		Ball: &ballstate{Speed: &vec2{X: -2, Y: 1}, Loc: &vec2{X: 50, Y: 50}},
+		Paddl: &paddle{
 			Height: 20,
 			Y:      50,
 			Left:   true,
 		},
-		PaddR: paddle{
+		PaddR: &paddle{
 			Height: 20,
 			Y:      50,
 			Left:   false,
@@ -55,22 +56,24 @@ func NewGame() *Game {
 type Action int
 
 const (
-	lup Action = iota
-	ldown
-	rup
-	rdown
+	Lup Action = iota
+	Ldown
+	Rup
+	Rdown
+	NoAction
 )
 
 func (g *Game) play(action Action) {
+	fmt.Println(action)
 	// move paddles
 	switch action {
-	case lup:
+	case Lup:
 		g.Paddl.Y -= 1 * inputScaling
-	case ldown:
+	case Ldown:
 		g.Paddl.Y += 1 * inputScaling
-	case rup:
+	case Rup:
 		g.PaddR.Y -= 1 * inputScaling
-	case rdown:
+	case Rdown:
 		g.PaddR.Y += 1 * inputScaling
 	default:
 	}
@@ -81,12 +84,37 @@ func (g *Game) play(action Action) {
 	g.Ball.Loc.Y += g.Ball.Speed.Y * delta
 
 	// calculate ceiling/floor collisions
-	if math.Abs(g.Ball.Loc.Y -50) >= 50 {
+	if math.Abs(g.Ball.Loc.Y-50) >= 50 {
 		g.Ball.Speed.Y *= -1
 	}
 
-	// calculate paddle collisions
-	if math.Abs(g.Ball.Loc.X - 50) >= 49 {
-		g.Ball.Speed.X *= -1
+	// calculate paddle collision left
+	if math.Abs(g.Ball.Loc.X-50) >= 49 && g.Ball.Speed.X < 0 {
+		if math.Abs(g.Ball.Loc.Y-g.Paddl.Y) < g.Paddl.Height/2 {
+			g.Ball.Speed.X *= -1
+		} else {
+			g.ScoreR += 1
+			g.resetBall(false)
+		}
+	} else if math.Abs(g.Ball.Loc.X-50) >= 49 && g.Ball.Speed.X > 0 {
+		if math.Abs(g.Ball.Loc.Y-g.PaddR.Y) < g.PaddR.Height/2 {
+			g.Ball.Speed.X *= -1
+		} else {
+
+			g.ScoreL += 1
+			g.resetBall(true)
+		}
+	}
+	g.Updated = time.Now()
+}
+
+func (g *Game) resetBall(goingLeft bool) {
+	g.Ball.Loc.X = 50
+	g.Ball.Loc.Y = 50
+	g.Ball.Speed.Y = 1
+	if goingLeft {
+		g.Ball.Speed.X = 2
+	} else {
+		g.Ball.Speed.Y = -2
 	}
 }
