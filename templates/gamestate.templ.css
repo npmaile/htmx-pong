@@ -1,0 +1,28 @@
+/*
+{{.Ball.Loc.X}}
+{{.Ball.Loc.Y}}
+{{.Paddl.Y}}
+{{.Paddl.Height}}
+{{.PaddR.Height}}
+{{.ScoreL}}
+{{.ScoreR}}
+{{.Completed}}
+*/
+
+.paddl{
+	top: {{.Paddl.Y}}%;
+	translateY: -50%;
+}
+
+.paddR{
+
+	top: {{.Paddl.Y}}%;
+	translateY: -50%;
+}
+
+.ball{
+	top: {{.Ball.Loc.Y}}%;
+	translateY: -50%;
+	left: {{.Ball.Loc.X}}%;
+	translateX: -50%;
+}

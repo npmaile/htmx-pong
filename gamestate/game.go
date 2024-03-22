@@ -6,49 +6,49 @@ import (
 )
 
 const inputScaling float64 = 1.0
-const timeScaling float64 = 1.0
+const timeScaling float64 = 0.1
 
 type vec2 struct {
-	x float64
-	y float64
+	X float64
+	Y float64
 }
 
 type ballstate struct {
-	speed vec2
-	loc   vec2
+	Speed vec2
+	Loc   vec2
 }
 
 type paddle struct {
-	height float64
-	y      float64
-	left   bool
+	Height float64
+	Y      float64
+	Left   bool
 }
 
 type Game struct {
-	paddR     paddle
-	paddl     paddle
-	ball      ballstate
-	updated   time.Time
-	scoreL    int
-	scoreR    int
-	completed bool
+	Updated   time.Time
+	Ball      ballstate
+	PaddR     paddle
+	Paddl     paddle
+	ScoreL    int
+	ScoreR    int
+	Completed bool
 }
 
 func NewGame() *Game {
 	return &Game{
-		ball: ballstate{speed: vec2{x: 2, y: 1}, loc: vec2{x: 50, y: 50}},
-		paddl: paddle{
-			height: 20,
-			y:      50,
-			left:   true,
+		Ball: ballstate{Speed: vec2{X: 2, Y: 1}, Loc: vec2{X: 50, Y: 50}},
+		Paddl: paddle{
+			Height: 20,
+			Y:      50,
+			Left:   true,
 		},
-		paddR: paddle{
-			height: 20,
-			y:      50,
-			left:   false,
+		PaddR: paddle{
+			Height: 20,
+			Y:      50,
+			Left:   false,
 		},
-		updated:   time.Now(),
-		completed: false,
+		Updated:   time.Now(),
+		Completed: false,
 	}
 }
 
@@ -65,27 +65,27 @@ func (g *Game) play(action Action) {
 	// move paddles
 	switch action {
 	case lup:
-		g.paddl.y -= 1 * inputScaling
+		g.Paddl.Y -= 1 * inputScaling
 	case ldown:
-		g.paddl.y += 1 * inputScaling
+		g.Paddl.Y += 1 * inputScaling
 	case rup:
-		g.paddR.y -= 1 * inputScaling
+		g.PaddR.Y -= 1 * inputScaling
 	case rdown:
-		g.paddR.y += 1 * inputScaling
+		g.PaddR.Y += 1 * inputScaling
 	default:
 	}
 
 	// move balls
-	delta := float64(time.Now().Sub(g.updated)) * timeScaling
-	g.ball.loc.x += g.ball.speed.x * delta
-	g.ball.loc.y += g.ball.speed.y * delta
+	delta := float64(time.Since(g.Updated)) * timeScaling
+	g.Ball.Loc.X += g.Ball.Speed.X * delta
+	g.Ball.Loc.Y += g.Ball.Speed.Y * delta
 
 	// calculate ceiling/floor collisions
-	if math.Abs(g.ball.loc.y) >= 100.0 {
-		g.ball.speed.y *= -1
+	if math.Abs(g.Ball.Loc.Y) >= 100.0 {
+		g.Ball.Speed.Y *= -1
 	}
 
 	// calculate paddle collisions
-	if math.Abs(g.ball.loc.x) >= 99.0 {
+	if math.Abs(g.Ball.Loc.X) >= 99.0 {
 	}
 }

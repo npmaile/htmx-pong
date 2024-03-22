@@ -13,26 +13,64 @@
 			color-scheme: light dark;
 		}
 
-		.gameObject {}
+		@media (prefers-color-scheme: dark) {
+			.gameObject {
+				background-color: white;
+			}
+		}
 
-		.paddl {}
+		@media (prefers-color-scheme: light) {
+			.gameObject {
+				background-color: black;
+			}
+		}
 
-		.paddr {}
+		body {
+			padding: 0px;
+			margin: 0px;
+		}
 
-		.ball {}
+		.screen {
+			position: fixed;
+			width: 100%;
+			height: 100%;
+			min-width: 100%;
+			min-height: 100%;
+		}
+
+		.Paddle {
+			width: 5%;
+			height: 25%;
+		}
+
+		.paddL {
+			position: absolute;
+			left: 0px;
+		}
+
+		.paddR {
+			position: absolute;
+			right: 0px;
+			/*💕*/
+		}
+
+		.Ball {
+			width: 5%;
+			height: 5%;
+		}
 	</style>
 	<style class="game">
 
 	</style>
 </head>
 
-<body>
-	<div class="screen" hx-get="/gameupdate" hx-target=".game">
-		<div class="gameObject paddl">
+<body hx-trigger="keypress[key=='w']" hx-get="/update" hx-target=".game">
+	<div class="screen">
+		<div class="gameObject paddl paddL Paddle">
 		</div>
-		<div class="gameObject paddr">
+		<div class="gameObject paddr paddR Paddle">
 		</div>
-		<div class="gameObject ball">
+		<div class="gameObject ball Ball">
 		</div>
 	</div>
 </body>
