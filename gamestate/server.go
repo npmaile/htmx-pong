@@ -20,13 +20,8 @@ func Init() GameStateSingleton {
 	}
 }
 
-type NewGameResponse struct {
-	GameID string
-	Game   Game
-}
-
 type NewGameRequest struct {
-	Res chan NewGameResponse
+	Res chan Game
 }
 
 type GameUpdateRequest struct {
@@ -42,12 +37,9 @@ func (gss *GameStateSingleton) StartProcessing() {
 			fmt.Println("got new game request")
 			uid, _ := uuid.NewRandom()
 			id := uid.String()
-			game := NewGame()
+			game := NewGame(id)
 			gss.games[id] = game
-			req.Res <- NewGameResponse{
-				Game:   *game,
-				GameID: id,
-			}
+			req.Res <- *game
 		case req := <-gss.GameUpdateRequests:
 			g := gss.games[req.ID]
 			g.play(req.A)

@@ -1,12 +1,11 @@
 package gamestate
 
 import (
-	"fmt"
 	"math"
 	"time"
 )
 
-const inputScaling float64 = 1.0
+const inputScaling float64 = 4.0
 const timeScaling float64 = 0.00000001
 
 type vec2 struct {
@@ -33,23 +32,25 @@ type Game struct {
 	ScoreL    int
 	ScoreR    int
 	Completed bool
+	ID        string
 }
 
-func NewGame() *Game {
+func NewGame(ID string) *Game {
 	return &Game{
 		Ball: &ballstate{Speed: &vec2{X: -2, Y: 1}, Loc: &vec2{X: 50, Y: 50}},
 		Paddl: &paddle{
-			Height: 20,
+			Height: 25,
 			Y:      50,
 			Left:   true,
 		},
 		PaddR: &paddle{
-			Height: 20,
+			Height: 25,
 			Y:      50,
 			Left:   false,
 		},
 		Updated:   time.Now(),
 		Completed: false,
+		ID:        ID,
 	}
 }
 
@@ -64,7 +65,6 @@ const (
 )
 
 func (g *Game) play(action Action) {
-	fmt.Println(action)
 	// move paddles
 	switch action {
 	case Lup:
@@ -89,14 +89,14 @@ func (g *Game) play(action Action) {
 	}
 
 	// calculate paddle collision left
-	if math.Abs(g.Ball.Loc.X-50) >= 49 && g.Ball.Speed.X < 0 {
+	if math.Abs(g.Ball.Loc.X-50) >= 43 && g.Ball.Speed.X < 0 {
 		if math.Abs(g.Ball.Loc.Y-g.Paddl.Y) < g.Paddl.Height/2 {
 			g.Ball.Speed.X *= -1
 		} else {
 			g.ScoreR += 1
 			g.resetBall(false)
 		}
-	} else if math.Abs(g.Ball.Loc.X-50) >= 49 && g.Ball.Speed.X > 0 {
+	} else if math.Abs(g.Ball.Loc.X-50) >= 43 && g.Ball.Speed.X > 0 {
 		if math.Abs(g.Ball.Loc.Y-g.PaddR.Y) < g.PaddR.Height/2 {
 			g.Ball.Speed.X *= -1
 		} else {

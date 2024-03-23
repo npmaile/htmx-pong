@@ -4,7 +4,6 @@
 <head>
 	<script src="./static/htmx.js"></script>
 	<meta property="og:type" content="website">
-	<meta property="og:url" content="{{ .url }}">
 	<meta property="og:title" content="the greatest pong ever">
 	<meta property="og:description"
 		content="within this page you will experience the greatness brought into this world by the dynamic duo of nathaniel p maile and some other guy">
@@ -17,18 +16,28 @@
 			.gameObject {
 				background-color: white;
 			}
+
+			.scoreLeft {
+				color: white;
+			}
 		}
 
 		@media (prefers-color-scheme: light) {
 			.gameObject {
 				background-color: black;
 			}
+
+			.scoreRight {
+				color: white;
+			}
+
 		}
 
 		body {
 			padding: 0px;
 			margin: 0px;
 		}
+
 		span {
 			position: absolute;
 			width: 100%;
@@ -50,22 +59,44 @@
 
 		.paddL {
 			position: absolute;
-	transform:translateY(-50%);
+			transform: translateY(-50%);
 			left: 0px;
 		}
 
 		.paddR {
 			position: absolute;
-	transform:translateY(-50%);
+			transform: translateY(-50%);
 			right: 0px;
 			/*💕*/
 		}
 
 		.Ball {
 			position: absolute;
-			transform:translateY(-50%)translateX(-50%);
+			transform: translateY(-50%)translateX(-50%);
 			width: 5%;
 			height: 5%;
+		}
+
+		.divider {
+			position: absolute;
+			width: 1%;
+			height: 100%;
+			left: 49.5%;
+		}
+
+		.scoreLeft {
+			position: absolute;
+			width: 18%;
+			height: 18%;
+			left: 25%;
+
+		}
+
+		.scoreRight {
+			position: absolute;
+			width: 18%;
+			height: 18%;
+			right: 25%;
 		}
 	</style>
 	<style class="game">
@@ -74,19 +105,10 @@
 </head>
 
 <body>
-	<span hx-trigger="keypress[key=='w'] from:body queue:first" hx-get="/update/left/up" hx-target=".game"></span>
-	<span hx-trigger="keypress[key=='s'] from:body queue:first" hx-get="/update/left/down" hx-target=".game"></span>
-	<span hx-trigger="keypress[key=='i'] from:body queue:first" hx-get="/update/right/up" hx-target=".game"></span>
-	<span hx-trigger="keypress[key=='k'] from:body queue:first" hx-get="/update/right/down" hx-target=".game"></span>
-	<span hx-trigger="every 20ms" hx-get="/update" hx-target=".game"></span>
-	<div class="screen">
-		<div class="gameObject paddL l Paddle">
-		</div>
-		<div class="gameObject paddR r Paddle">
-		</div>
-		<div class="gameObject b Ball">
-		</div>
-	</div>
+	<p>
+		hello, and welcome to htmx pong! if you wish to get started, please press
+		<button hx-target="body" hx-on="click" hx-get="/pong">here</button>
+	</p>
 </body>
 
 </html>

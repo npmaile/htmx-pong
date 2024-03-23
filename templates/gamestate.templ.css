@@ -1,3 +1,5 @@
 .l{top:{{.Paddl.Y}}%;}
 .r{top:{{.PaddR.Y}}%;}
 .b{top:{{.Ball.Loc.Y}}%;left:{{.Ball.Loc.X}}%;}
+.sr::after{content:"{{.ScoreR}}";}
+.sl::before{content:"{{.ScoreL}}";}
