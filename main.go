@@ -34,9 +34,13 @@ func main() {
 	http.Handle("/static/", http.FileServerFS(staticFS))
 	http.HandleFunc("/", index)
 	http.HandleFunc("/pong", pongFunc(gs))
-	http.HandleFunc("/update/{id}", updateFunc(gs))
-	http.HandleFunc("/update/up/{id}", updateFuncUp(gs))
-	http.HandleFunc("/update/down/{id}", updateFuncDown(gs))
+	http.HandleFunc("/friendroom", startFriendRoomFunc(gs))
+	http.HandleFunc("/matchmaking", startMatchMakingFunc(gs))
+	http.HandleFunc("/friendConnect", friendConnectFunc(gs))
+
+	http.HandleFunc("/update/{id}/{player}", updateFunc(gs, gamestate.NoAction))
+	http.HandleFunc("/update/up/{id}/{player}", updateFunc(gs, gamestate.Up))
+	http.HandleFunc("/update/down/{id}/{player}", updateFunc(gs, gamestate.Down))
 	fmt.Println("running on 8080")
 	http.ListenAndServe(":8080", nil)
 }
@@ -44,6 +48,24 @@ func main() {
 func index(w http.ResponseWriter, r *http.Request) {
 	templates.ExecuteTemplate(w, "index.templ.html", nil)
 }
+
+func startFriendRoomFunc(gs gamestate.GameStateSingleton) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		gs.NewWaitingRoomRequests <- gamestate.WaitingRoomRequest{}
+	}
+}
+
+func friendConnectFunc(gs gamestate.GameStateSingleton) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+	}
+}
+
+func startMatchMakingFunc(gs gamestate.GameStateSingleton) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		gs.NewMatchMakingRequests <- gamestate.MatchMakingRequest{}
+	}
+}
+
 func pongFunc(gs gamestate.GameStateSingleton) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		Res := make(chan gamestate.Game)
@@ -58,48 +80,15 @@ func pongFunc(gs gamestate.GameStateSingleton) func(w http.ResponseWriter, r *ht
 	}
 }
 
-func updateFunc(gs gamestate.GameStateSingleton) func(w http.ResponseWriter, r *http.Request) {
+func updateFunc(gs gamestate.GameStateSingleton, updateAction gamestate.Action) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// lookup the user
 		ch := make(chan gamestate.Game)
 		gs.GameUpdateRequests <- gamestate.GameUpdateRequest{
-			Ch: ch,
-			ID: r.PathValue("id"),
-			A:  gamestate.NoAction,
-		}
-		a := <-ch
-		err := templates.ExecuteTemplate(w, "gamestate.templ.css", a)
-		if err != nil {
-			panic(err)
-		}
-	}
-}
-
-func updateFuncUp(gs gamestate.GameStateSingleton) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		// lookup the user
-		ch := make(chan gamestate.Game)
-		gs.GameUpdateRequests <- gamestate.GameUpdateRequest{
-			Ch: ch,
-			ID: r.PathValue("id"),
-			A:  gamestate.Lup,
-		}
-		a := <-ch
-		err := templates.ExecuteTemplate(w, "gamestate.templ.css", a)
-		if err != nil {
-			panic(err)
-		}
-	}
-}
-
-func updateFuncDown(gs gamestate.GameStateSingleton) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		// lookup the user
-		ch := make(chan gamestate.Game)
-		gs.GameUpdateRequests <- gamestate.GameUpdateRequest{
-			Ch: ch,
-			ID: r.PathValue("id"),
-			A:  gamestate.Ldown,
+			Ch:       ch,
+			ID:       r.PathValue("id"),
+			A:        updateAction,
+			PlayerID: r.PathValue("player"),
 		}
 		a := <-ch
 		err := templates.ExecuteTemplate(w, "gamestate.templ.css", a)

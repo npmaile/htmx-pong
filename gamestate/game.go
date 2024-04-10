@@ -1,6 +1,7 @@
 package gamestate
 
 import (
+	"errors"
 	"math"
 	"time"
 )
@@ -25,14 +26,30 @@ type paddle struct {
 }
 
 type Game struct {
-	Updated   time.Time
-	Ball      *ballstate
-	PaddR     *paddle
-	Paddl     *paddle
-	ScoreL    int
-	ScoreR    int
-	Completed bool
-	ID        string
+	Updated       time.Time
+	Ball          *ballstate
+	PaddR         *paddle
+	Paddl         *paddle
+	ID            string
+	LeftPlayerID  string
+	RightPlayerID string
+	ScoreL        int
+	ScoreR        int
+	GameState     state
+}
+
+type state int
+
+const (
+	STARTED state = iota
+	WAITING
+	LEFT_WIN
+	RIGHT_WIN
+)
+
+type GameUpdate struct {
+	PlayerID string
+	Game
 }
 
 func NewGame(ID string) *Game {
@@ -49,32 +66,50 @@ func NewGame(ID string) *Game {
 			Left:   false,
 		},
 		Updated:   time.Now(),
-		Completed: false,
+		GameState: WAITING,
 		ID:        ID,
 	}
+}
+
+func (g *Game) start() {
+	g.GameState = STARTED
 }
 
 type Action int
 
 const (
-	Lup Action = iota
-	Ldown
-	Rup
-	Rdown
+	Up Action = iota
+	Down
 	NoAction
 )
 
-func (g *Game) play(action Action) {
+func (g *Game) play(action Action, playerID string) error {
+	switch g.GameState {
+	case WAITING:
+		return errors.New("game not started")
+	case LEFT_WIN:
+		return nil
+	case RIGHT_WIN:
+		return nil
+	case STARTED:
+	}
 	// move paddles
+	var targetPaddle *paddle
+	switch playerID {
+	case g.LeftPlayerID:
+		targetPaddle = g.Paddl
+	case g.RightPlayerID:
+		targetPaddle = g.PaddR
+	default:
+		return errors.New("no user found")
+
+	}
+
 	switch action {
-	case Lup:
-		g.Paddl.Y -= 1 * inputScaling
-	case Ldown:
-		g.Paddl.Y += 1 * inputScaling
-	case Rup:
-		g.PaddR.Y -= 1 * inputScaling
-	case Rdown:
-		g.PaddR.Y += 1 * inputScaling
+	case Up:
+		targetPaddle.Y -= 1 * inputScaling
+	case Down:
+		targetPaddle.Y += 1 * inputScaling
 	default:
 	}
 
@@ -106,13 +141,15 @@ func (g *Game) play(action Action) {
 		}
 	}
 	g.Updated = time.Now()
+
+	return nil
 }
 
 func (g *Game) resetBall(goingLeft bool) {
 	g.Ball.Loc.X = 50
 	g.Ball.Loc.Y = 50
 	g.Ball.Speed.Y = 1
-	if goingLeft {
+	if !goingLeft {
 		g.Ball.Speed.X = 2
 	} else {
 		g.Ball.Speed.Y = -2
