@@ -1,8 +1,6 @@
 package gamestate
 
 import (
-	"fmt"
-
 	"github.com/google/uuid"
 )
 
@@ -59,18 +57,15 @@ func (gss *GameStateSingleton) StartProcessing() {
 		select {
 		case req := <-gss.NewMatchMakingRequests:
 			if gss.matchMakingWaitingRoom == nil {
-				fmt.Println(1)
 				id, err := uuid.NewV6()
 				if err != nil {
 					panic(err)
 				}
-				fmt.Println(2)
 				g := NewGame(id.String())
 				leftPlayerID, err := uuid.NewV6()
 				if err != nil {
 					panic(err)
 				}
-				fmt.Println(3)
 				g.LeftPlayerID = leftPlayerID.String()
 				req.Res <- GameResponse{
 					G:        *g,
@@ -78,14 +73,11 @@ func (gss *GameStateSingleton) StartProcessing() {
 					PlayerID: g.LeftPlayerID,
 				}
 				gss.matchMakingWaitingRoom = g
-				fmt.Println(4)
-
 			} else {
 				rightPlayerID, err := uuid.NewV6()
 				if err != nil {
 					panic(err)
 				}
-				fmt.Println(6)
 				rightPlayerIDString := rightPlayerID.String()
 				gss.matchMakingWaitingRoom.RightPlayerID = rightPlayerIDString
 				gss.matchMakingWaitingRoom.start()
@@ -94,11 +86,9 @@ func (gss *GameStateSingleton) StartProcessing() {
 					Ready:    true,
 					PlayerID: rightPlayerIDString,
 				}
-				fmt.Println(893)
 				gss.matchMakingWaitingRoom.start()
 				gss.games[gss.matchMakingWaitingRoom.ID] = gss.matchMakingWaitingRoom
 				gss.matchMakingWaitingRoom = nil
-				fmt.Println("sdjkfols")
 			}
 		//case req := <-gss.NewWaitingRoomRequests:
 
