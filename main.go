@@ -36,7 +36,7 @@ func main() {
 	http.HandleFunc("/pong", pongFunc(gs))
 	http.HandleFunc("/friendroom", startFriendRoomFunc(gs))
 	http.HandleFunc("/matchmaking", startMatchMakingFunc(gs))
-	http.HandleFunc("/friendConnect", friendConnectFunc(gs))
+	//http.HandleFunc("/friendConnect", friendConnectFunc(gs))
 
 	http.HandleFunc("/update/{id}/{player}", updateFunc(gs, gamestate.NoAction))
 	http.HandleFunc("/update/up/{id}/{player}", updateFunc(gs, gamestate.Up))
@@ -55,23 +55,30 @@ func startFriendRoomFunc(gs gamestate.GameStateSingleton) func(w http.ResponseWr
 	}
 }
 
+/*
 func friendConnectFunc(gs gamestate.GameStateSingleton) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 	}
 }
+*/
 
 func startMatchMakingFunc(gs gamestate.GameStateSingleton) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		gs.NewMatchMakingRequests <- gamestate.MatchMakingRequest{}
+		res := make(chan gamestate.GameResponse)
+		gs.NewMatchMakingRequests <- gamestate.MatchMakingRequest{
+			Res: res,
+		}
+		result := <-res
+		err := templates.ExecuteTemplate(w, "pong.templ.html", result)
+		if err != nil {
+			fmt.Println("error from template:", err.Error())
+		}
 	}
 }
 
 func pongFunc(gs gamestate.GameStateSingleton) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		Res := make(chan gamestate.Game)
-		gs.NewGameRequests <- gamestate.NewGameRequest{
-			Res: Res,
-		}
+		Res := make(chan gamestate.GameResponse)
 		ng := <-Res
 		err := templates.ExecuteTemplate(w, "pong.templ.html", ng)
 		if err != nil {

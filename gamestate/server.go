@@ -8,6 +8,8 @@ import (
 
 type GameStateSingleton struct {
 	games                  map[string]*Game
+	WaitingRooms           map[string]*Game
+	matchMakingWaitingRoom *Game
 	NewMatchMakingRequests chan MatchMakingRequest
 	NewWaitingRoomRequests chan WaitingRoomRequest
 	GameUpdateRequests     chan GameUpdateRequest
@@ -23,21 +25,26 @@ func Init() GameStateSingleton {
 }
 
 type MatchMakingRequest struct {
-	res chan MatchMakingResponse
+	Res chan GameResponse
 }
 
 type WaitingRoomRequest struct {
-	res chan WaitingRoomResponse
+	res chan GameResponse
 }
 
-type WaitingRoomResponse struct {
-	g     Game
-	ready bool
+type FriendJoinRequest struct {
+	res chan FriendJoinResponse
 }
 
-type MatchMakingResponse struct {
-	g     Game
-	ready bool
+type GameResponse struct {
+	PlayerID string
+	G        Game
+	Ready    bool
+}
+
+type FriendJoinResponse struct {
+	G     Game
+	Found bool
 }
 
 type GameUpdateRequest struct {
@@ -51,7 +58,52 @@ func (gss *GameStateSingleton) StartProcessing() {
 	for {
 		select {
 		case req := <-gss.NewMatchMakingRequests:
-		case req := <-gss.NewWaitingRoomRequests:
+			if gss.matchMakingWaitingRoom == nil {
+				fmt.Println(1)
+				id, err := uuid.NewV6()
+				if err != nil {
+					panic(err)
+				}
+				fmt.Println(2)
+				g := NewGame(id.String())
+				leftPlayerID, err := uuid.NewV6()
+				if err != nil {
+					panic(err)
+				}
+				fmt.Println(3)
+				g.LeftPlayerID = leftPlayerID.String()
+				req.Res <- GameResponse{
+					G:        *g,
+					Ready:    false,
+					PlayerID: g.LeftPlayerID,
+				}
+				gss.matchMakingWaitingRoom = g
+				fmt.Println(4)
+
+			} else {
+				rightPlayerID, err := uuid.NewV6()
+				if err != nil {
+					panic(err)
+				}
+				fmt.Println(6)
+				rightPlayerIDString := rightPlayerID.String()
+				gss.matchMakingWaitingRoom.RightPlayerID = rightPlayerIDString
+				gss.matchMakingWaitingRoom.start()
+				req.Res <- GameResponse{
+					G:        *gss.matchMakingWaitingRoom,
+					Ready:    true,
+					PlayerID: rightPlayerIDString,
+				}
+				fmt.Println(893)
+				gss.matchMakingWaitingRoom.start()
+				gss.games[gss.matchMakingWaitingRoom.ID] = gss.matchMakingWaitingRoom
+				gss.matchMakingWaitingRoom = nil
+				fmt.Println("sdjkfols")
+			}
+		//case req := <-gss.NewWaitingRoomRequests:
+
+		//case req := <-gss.FriendJoinRequests:
+
 		case req := <-gss.GameUpdateRequests:
 			g := gss.games[req.ID]
 			g.play(req.A, req.PlayerID)
