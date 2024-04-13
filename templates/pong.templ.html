@@ -24,7 +24,7 @@
 
 </div>
 {{ else }}
-<span hx-trigger="every 3ms" hx-get="/pongWaiting/{{.G.ID}}/{{.PlayerID}}" hx-target=".game"></span>
+<span hx-trigger="every 3ms" hx-get="/pong/{{.G.ID}}/{{.PlayerID}}" hx-target="body"></span>
 <p>
 	Waiting for another player
 </p {{ end }}

@@ -1,5 +1,5 @@
-.l{top:{{.Paddl.Y}}%;}
-.r{top:{{.PaddR.Y}}%;}
-.b{top:{{.Ball.Loc.Y}}%;left:{{.Ball.Loc.X}}%;}
-.sr::after{content:"{{.ScoreR}}";}
-.sl::before{content:"{{.ScoreL}}";}
+.l{top:{{.G.Paddl.Y}}%;}
+.r{top:{{.G.PaddR.Y}}%;}
+.b{top:{{.G.Ball.Loc.Y}}%;left:{{.G.Ball.Loc.X}}%;}
+.sr::after{content:"{{.G.ScoreR}}";}
+.sl::before{content:"{{.G.ScoreL}}";}

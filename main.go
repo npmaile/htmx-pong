@@ -33,10 +33,9 @@ func main() {
 
 	http.Handle("/static/", http.FileServerFS(staticFS))
 	http.HandleFunc("/", index)
-	http.HandleFunc("/pong", pongFunc(gs))
+	http.HandleFunc("/pong/{id}/{player}", matchMakingWaiting(gs))
 	http.HandleFunc("/friendroom", startFriendRoomFunc(gs))
 	http.HandleFunc("/matchmaking", startMatchMakingFunc(gs))
-	//http.HandleFunc("/friendConnect", friendConnectFunc(gs))
 
 	http.HandleFunc("/update/{id}/{player}", updateFunc(gs, gamestate.NoAction))
 	http.HandleFunc("/update/up/{id}/{player}", updateFunc(gs, gamestate.Up))
@@ -55,20 +54,16 @@ func startFriendRoomFunc(gs gamestate.GameStateSingleton) func(w http.ResponseWr
 	}
 }
 
-/*
-func friendConnectFunc(gs gamestate.GameStateSingleton) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-	}
-}
-*/
-
 func startMatchMakingFunc(gs gamestate.GameStateSingleton) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		res := make(chan gamestate.GameResponse)
+		fmt.Println("trying to send on the channel")
 		gs.NewMatchMakingRequests <- gamestate.MatchMakingRequest{
 			Res: res,
 		}
+		fmt.Println("waiting in startMatchmaking")
 		result := <-res
+		fmt.Println("done waiting in startMatchmaking")
 		err := templates.ExecuteTemplate(w, "pong.templ.html", result)
 		if err != nil {
 			fmt.Println("error from template:", err.Error())
@@ -76,10 +71,18 @@ func startMatchMakingFunc(gs gamestate.GameStateSingleton) func(w http.ResponseW
 	}
 }
 
-func pongFunc(gs gamestate.GameStateSingleton) func(w http.ResponseWriter, r *http.Request) {
+func matchMakingWaiting(gs gamestate.GameStateSingleton) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
+
 		Res := make(chan gamestate.GameResponse)
+		gs.GameUpdateRequests <- gamestate.GameUpdateRequest{
+			Res:      Res,
+			ID:       r.PathValue("id"),
+			PlayerID: r.PathValue("player"),
+		}
+		fmt.Println("waiting in matchMakingWaiting")
 		ng := <-Res
+		fmt.Println("done waiting in matchMakingWaiting")
 		err := templates.ExecuteTemplate(w, "pong.templ.html", ng)
 		if err != nil {
 			fmt.Println("error from template:", err.Error())
@@ -90,12 +93,12 @@ func pongFunc(gs gamestate.GameStateSingleton) func(w http.ResponseWriter, r *ht
 func updateFunc(gs gamestate.GameStateSingleton, updateAction gamestate.Action) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		// lookup the user
-		ch := make(chan gamestate.Game)
+		ch := make(chan gamestate.GameResponse)
 		gs.GameUpdateRequests <- gamestate.GameUpdateRequest{
-			Ch:       ch,
+			Res:      ch,
 			ID:       r.PathValue("id"),
-			A:        updateAction,
 			PlayerID: r.PathValue("player"),
+			A:        updateAction,
 		}
 		a := <-ch
 		err := templates.ExecuteTemplate(w, "gamestate.templ.css", a)
