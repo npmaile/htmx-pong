@@ -36,8 +36,7 @@ func main() {
 	http.HandleFunc("/pong/{id}/{player}", matchMakingWaiting(gs))
 	http.HandleFunc("/friendroom", startFriendRoomFunc(gs))
 	http.HandleFunc("/matchmaking", startMatchMakingFunc(gs))
-
-	http.HandleFunc("/update/{id}/{player}", updateFunc(gs, gamestate.NoAction))
+	http.HandleFunc("/update/no-action/{id}/{player}", updateFunc(gs, gamestate.NoAction))
 	http.HandleFunc("/update/up/{id}/{player}", updateFunc(gs, gamestate.Up))
 	http.HandleFunc("/update/down/{id}/{player}", updateFunc(gs, gamestate.Down))
 	fmt.Println("running on 8080")

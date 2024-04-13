@@ -63,9 +63,7 @@ func (gss *GameStateSingleton) StartProcessing() {
 	for {
 		select {
 		case req := <-gss.NewMatchMakingRequests:
-			fmt.Println("1")
 			if gss.matchMakingWaitingRoom == nil {
-				fmt.Println("2")
 				idStruct, err := uuid.NewV6()
 				if err != nil {
 					panic(err)
@@ -77,7 +75,6 @@ func (gss *GameStateSingleton) StartProcessing() {
 				if err != nil {
 					panic(err)
 				}
-				fmt.Println("3")
 				g.LeftPlayerID = leftPlayerID.String()
 				req.Res <- GameResponse{
 					G:        *g,
@@ -86,7 +83,6 @@ func (gss *GameStateSingleton) StartProcessing() {
 				}
 				gss.matchMakingWaitingRoom = g
 			} else {
-				fmt.Println("4")
 				rightPlayerID, err := uuid.NewV6()
 				if err != nil {
 					panic(err)
@@ -99,7 +95,6 @@ func (gss *GameStateSingleton) StartProcessing() {
 					Ready:    true,
 					PlayerID: rightPlayerIDString,
 				}
-				fmt.Println("5")
 				gss.matchMakingWaitingRoom.start()
 				gss.matchMakingWaitingRoom = nil
 			}
@@ -107,7 +102,6 @@ func (gss *GameStateSingleton) StartProcessing() {
 
 		//case req := <-gss.FriendJoinRequests:
 		case req := <-gss.MatchMakingWaiting:
-			fmt.Println("6")
 			{
 				g, ok := gss.games[req.ID]
 				if !ok {
@@ -116,7 +110,6 @@ func (gss *GameStateSingleton) StartProcessing() {
 					}
 					goto end
 				}
-				fmt.Println("7")
 				switch g.GameState {
 				case WAITING:
 					{
@@ -165,6 +158,7 @@ func (gss *GameStateSingleton) StartProcessing() {
 					//do nothing and allow app to continue
 				}
 			}
+			fmt.Println("playing game")
 			g.play(req.A, req.PlayerID)
 			req.Res <- GameResponse{
 				PlayerID: req.PlayerID,

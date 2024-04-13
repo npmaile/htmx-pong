@@ -2,6 +2,7 @@ package gamestate
 
 import (
 	"errors"
+	"fmt"
 	"math"
 	"time"
 )
@@ -92,13 +93,18 @@ func (g *Game) play(action Action, playerID string) error {
 	case RIGHT_WIN:
 		return nil
 	case STARTED:
+		//continue on
+	default:
+		return errors.New("wat")
 	}
 	// move paddles
 	var targetPaddle *paddle
 	switch playerID {
 	case g.LeftPlayerID:
+		fmt.Println("left player found")
 		targetPaddle = g.Paddl
 	case g.RightPlayerID:
+		fmt.Println("right player found")
 		targetPaddle = g.PaddR
 	default:
 		return errors.New("no user found")
@@ -107,8 +113,10 @@ func (g *Game) play(action Action, playerID string) error {
 
 	switch action {
 	case Up:
+		fmt.Println("moving up")
 		targetPaddle.Y -= 1 * inputScaling
 	case Down:
+		fmt.Println("moving down")
 		targetPaddle.Y += 1 * inputScaling
 	default:
 	}
