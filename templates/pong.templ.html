@@ -24,7 +24,11 @@
 
 </div>
 {{ else }}
-<span hx-trigger="every 3ms" hx-get="/pong/{{.G.ID}}/{{.PlayerID}}" hx-target="body"></span>
+<span hx-trigger="every 100ms" hx-get="/pong/{{.G.ID}}/{{.PlayerID}}" hx-target="body"></span>
 <p>
 	Waiting for another player
+	{{ if .UsingFriendCode }}
+	<br></br>
+	Please tell your friend to enter the code {{.G.ID}}
+	{{ end }}
 </p {{ end }}

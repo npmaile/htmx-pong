@@ -34,8 +34,8 @@ func main() {
 	http.Handle("/static/", http.FileServerFS(staticFS))
 	http.HandleFunc("/", index)
 	http.HandleFunc("/pong/{id}/{player}", matchMakingWaiting(gs))
-	http.HandleFunc("/friendroom", startFriendRoomFunc(gs))
 	http.HandleFunc("/matchmaking", startMatchMakingFunc(gs))
+	http.HandleFunc("/friendroom", openFriendRoomFunc(gs))
 	http.HandleFunc("/update/no-action/{id}/{player}", updateFunc(gs, gamestate.NoAction))
 	http.HandleFunc("/update/up/{id}/{player}", updateFunc(gs, gamestate.Up))
 	http.HandleFunc("/update/down/{id}/{player}", updateFunc(gs, gamestate.Down))
@@ -47,9 +47,21 @@ func index(w http.ResponseWriter, r *http.Request) {
 	templates.ExecuteTemplate(w, "index.templ.html", nil)
 }
 
-func startFriendRoomFunc(gs gamestate.GameStateSingleton) func(w http.ResponseWriter, r *http.Request) {
+func openFriendRoomFunc(gs gamestate.GameStateSingleton) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		gs.NewWaitingRoomRequests <- gamestate.WaitingRoomRequest{}
+		res := make(chan gamestate.GameResponse)
+		gs.NewWaitingRoomRequests <- gamestate.WaitingRoomRequest{
+			Res: res,
+		}
+		result := <-res
+		if result.Error != nil {
+			//do something with this error
+			return
+		}
+		err := templates.ExecuteTemplate(w, "pong.templ.html", result)
+		if err != nil {
+			fmt.Println("error from template:", err.Error())
+		}
 	}
 }
 

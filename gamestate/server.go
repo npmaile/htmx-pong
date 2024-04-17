@@ -13,6 +13,7 @@ type GameStateSingleton struct {
 	MatchMakingWaiting     chan GameUpdateRequest
 	NewMatchMakingRequests chan MatchMakingRequest
 	NewWaitingRoomRequests chan WaitingRoomRequest
+	FriendJoinRequests     chan FriendJoinRequest
 	GameUpdateRequests     chan GameUpdateRequest
 }
 
@@ -23,6 +24,7 @@ func Init() GameStateSingleton {
 		MatchMakingWaiting:     make(chan GameUpdateRequest),
 		NewMatchMakingRequests: make(chan MatchMakingRequest),
 		NewWaitingRoomRequests: make(chan WaitingRoomRequest),
+		FriendJoinRequests:     make(chan FriendJoinRequest),
 		GameUpdateRequests:     make(chan GameUpdateRequest),
 	}
 }
@@ -32,18 +34,20 @@ type MatchMakingRequest struct {
 }
 
 type WaitingRoomRequest struct {
-	res chan GameResponse
+	Res chan GameResponse
 }
 
 type FriendJoinRequest struct {
-	res chan FriendJoinResponse
+	Res chan GameResponse
+	ID  string
 }
 
 type GameResponse struct {
-	Error    error
-	PlayerID string
-	G        Game
-	Ready    bool
+	Error           error
+	PlayerID        string
+	G               Game
+	Ready           bool
+	UsingFriendCode bool
 }
 
 type FriendJoinResponse struct {
@@ -94,12 +98,60 @@ func (gss *GameStateSingleton) StartProcessing() {
 					Ready:    true,
 					PlayerID: rightPlayerIDString,
 				}
-				gss.matchMakingWaitingRoom.start()
 				gss.matchMakingWaitingRoom = nil
 			}
-		//case req := <-gss.NewWaitingRoomRequests:
+		case req := <-gss.NewWaitingRoomRequests:
+			{
+				idStruct, err := uuid.NewV6()
+				if err != nil {
+					panic(err)
+				}
+				gameID := idStruct.String()
+				g := NewGame(gameID)
+				gss.games[gameID] = g
+				leftPlayerID, err := uuid.NewV6()
+				if err != nil {
+					panic(err)
+				}
+				g.LeftPlayerID = leftPlayerID.String()
+				req.Res <- GameResponse{
+					G:               *g,
+					Ready:           false,
+					PlayerID:        g.LeftPlayerID,
+					UsingFriendCode: true,
+				}
+			}
+		case req := <-gss.FriendJoinRequests:
+			{
+				g, ok := gss.games[req.ID]
+				if !ok {
+					req.Res <- GameResponse{
+						Error: errors.New("unable to find game of that id"),
+					}
+					goto end
+				}
+				if g.GameState != WAITING {
+					req.Res <- GameResponse{
+						Error: errors.New("game already full"),
+					}
+					goto end
+				}
 
-		//case req := <-gss.FriendJoinRequests:
+				rightPlayerID, err := uuid.NewV6()
+				if err != nil {
+					panic(err)
+				}
+				rightPlayerIDString := rightPlayerID.String()
+				g.RightPlayerID = rightPlayerIDString
+				g.start()
+				req.Res <- GameResponse{
+					G:        *gss.matchMakingWaitingRoom,
+					Ready:    true,
+					PlayerID: rightPlayerIDString,
+				}
+
+			}
+
 		case req := <-gss.MatchMakingWaiting:
 			{
 				g, ok := gss.games[req.ID]
@@ -113,10 +165,11 @@ func (gss *GameStateSingleton) StartProcessing() {
 				case WAITING:
 					{
 						req.Res <- GameResponse{
-							PlayerID: req.PlayerID,
-							G:        *g,
-							Ready:    false,
-							Error:    nil,
+							Error:           nil,
+							PlayerID:        req.PlayerID,
+							G:               *g,
+							Ready:           false,
+							UsingFriendCode: false,
 						}
 						goto end
 					}
@@ -143,11 +196,17 @@ func (gss *GameStateSingleton) StartProcessing() {
 			switch g.GameState {
 			case WAITING:
 				{
+					inFriendCodeMode := false
+					if gss.matchMakingWaitingRoom == nil || gss.matchMakingWaitingRoom.ID != req.ID {
+						inFriendCodeMode = true
+
+					}
 					req.Res <- GameResponse{
-						PlayerID: req.PlayerID,
-						G:        *g,
-						Ready:    false,
-						Error:    nil,
+						Error:           nil,
+						PlayerID:        req.PlayerID,
+						G:               *g,
+						Ready:           false,
+						UsingFriendCode: inFriendCodeMode,
 					}
 					goto end
 				}
