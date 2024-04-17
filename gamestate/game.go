@@ -127,7 +127,11 @@ func (g *Game) play(action Action, playerID string) error {
 	g.Ball.Loc.Y += g.Ball.Speed.Y * delta
 
 	// calculate ceiling/floor collisions
-	if math.Abs(g.Ball.Loc.Y-50) >= 50 {
+	if g.Ball.Loc.Y >= 100 && g.Ball.Speed.Y > 0 {
+		g.Ball.Speed.Y *= -1
+	}
+
+	if g.Ball.Loc.Y <= 0 && g.Ball.Speed.Y < 0 {
 		g.Ball.Speed.Y *= -1
 	}
 
@@ -139,6 +143,7 @@ func (g *Game) play(action Action, playerID string) error {
 			g.ScoreR += 1
 			g.resetBall(false)
 		}
+		// calculate paddle collision right
 	} else if math.Abs(g.Ball.Loc.X-50) >= 43 && g.Ball.Speed.X > 0 {
 		if math.Abs(g.Ball.Loc.Y-g.PaddR.Y) < g.PaddR.Height/2 {
 			g.Ball.Speed.X *= -1
