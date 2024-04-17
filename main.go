@@ -56,13 +56,10 @@ func startFriendRoomFunc(gs gamestate.GameStateSingleton) func(w http.ResponseWr
 func startMatchMakingFunc(gs gamestate.GameStateSingleton) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		res := make(chan gamestate.GameResponse)
-		fmt.Println("trying to send on the channel")
 		gs.NewMatchMakingRequests <- gamestate.MatchMakingRequest{
 			Res: res,
 		}
-		fmt.Println("waiting in startMatchmaking")
 		result := <-res
-		fmt.Println("done waiting in startMatchmaking")
 		err := templates.ExecuteTemplate(w, "pong.templ.html", result)
 		if err != nil {
 			fmt.Println("error from template:", err.Error())
@@ -79,9 +76,7 @@ func matchMakingWaiting(gs gamestate.GameStateSingleton) func(w http.ResponseWri
 			ID:       r.PathValue("id"),
 			PlayerID: r.PathValue("player"),
 		}
-		fmt.Println("waiting in matchMakingWaiting")
 		ng := <-Res
-		fmt.Println("done waiting in matchMakingWaiting")
 		err := templates.ExecuteTemplate(w, "pong.templ.html", ng)
 		if err != nil {
 			fmt.Println("error from template:", err.Error())

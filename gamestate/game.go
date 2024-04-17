@@ -2,7 +2,6 @@ package gamestate
 
 import (
 	"errors"
-	"fmt"
 	"math"
 	"time"
 )
@@ -101,10 +100,8 @@ func (g *Game) play(action Action, playerID string) error {
 	var targetPaddle *paddle
 	switch playerID {
 	case g.LeftPlayerID:
-		fmt.Println("left player found")
 		targetPaddle = g.Paddl
 	case g.RightPlayerID:
-		fmt.Println("right player found")
 		targetPaddle = g.PaddR
 	default:
 		return errors.New("no user found")
@@ -113,10 +110,8 @@ func (g *Game) play(action Action, playerID string) error {
 
 	switch action {
 	case Up:
-		fmt.Println("moving up")
 		targetPaddle.Y -= 1 * inputScaling
 	case Down:
-		fmt.Println("moving down")
 		targetPaddle.Y += 1 * inputScaling
 	default:
 	}
@@ -136,19 +131,18 @@ func (g *Game) play(action Action, playerID string) error {
 	}
 
 	// calculate paddle collision left
-	if math.Abs(g.Ball.Loc.X-50) >= 43 && g.Ball.Speed.X < 0 {
-		if math.Abs(g.Ball.Loc.Y-g.Paddl.Y) < g.Paddl.Height/2 {
+	if g.Ball.Loc.X <= 7 && g.Ball.Speed.X < 0 {
+		if math.Abs(g.Ball.Loc.Y-g.Paddl.Y) < g.Paddl.Height/2 && g.Ball.Speed.X < 0 {
 			g.Ball.Speed.X *= -1
-		} else {
+		} else if g.Ball.Speed.X < 0 {
 			g.ScoreR += 1
 			g.resetBall(false)
 		}
 		// calculate paddle collision right
-	} else if math.Abs(g.Ball.Loc.X-50) >= 43 && g.Ball.Speed.X > 0 {
-		if math.Abs(g.Ball.Loc.Y-g.PaddR.Y) < g.PaddR.Height/2 {
+	} else if g.Ball.Loc.X >= 93 && g.Ball.Speed.X > 0 {
+		if math.Abs(g.Ball.Loc.Y-g.PaddR.Y) < g.PaddR.Height/2 && g.Ball.Speed.X > 0 {
 			g.Ball.Speed.X *= -1
-		} else {
-
+		} else if g.Ball.Speed.X > 0 {
 			g.ScoreL += 1
 			g.resetBall(true)
 		}

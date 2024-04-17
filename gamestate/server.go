@@ -2,7 +2,6 @@ package gamestate
 
 import (
 	"errors"
-	"fmt"
 
 	"github.com/google/uuid"
 )
@@ -136,7 +135,6 @@ func (gss *GameStateSingleton) StartProcessing() {
 		case req := <-gss.GameUpdateRequests:
 			g, ok := gss.games[req.ID]
 			if !ok {
-				fmt.Println("8")
 				req.Res <- GameResponse{
 					Error: errors.New("no game found"),
 				}
@@ -158,7 +156,6 @@ func (gss *GameStateSingleton) StartProcessing() {
 					//do nothing and allow app to continue
 				}
 			}
-			fmt.Println("playing game")
 			g.play(req.A, req.PlayerID)
 			req.Res <- GameResponse{
 				PlayerID: req.PlayerID,
