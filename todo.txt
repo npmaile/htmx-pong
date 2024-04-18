@@ -1,4 +1,3 @@
-- friend-code game matching
 - single player mode
 - exit matchmaking waiting
 - nice landing page

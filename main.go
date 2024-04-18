@@ -37,6 +37,7 @@ func main() {
 	http.HandleFunc("/matchmaking", startMatchMakingFunc(gs))
 	http.HandleFunc("/friendroom", openFriendRoomFunc(gs))
 	http.HandleFunc("/update/no-action/{id}/{player}", updateFunc(gs, gamestate.NoAction))
+	http.HandleFunc("/friendConnect", friendConnectFunc(gs))
 	http.HandleFunc("/update/up/{id}/{player}", updateFunc(gs, gamestate.Up))
 	http.HandleFunc("/update/down/{id}/{player}", updateFunc(gs, gamestate.Down))
 	fmt.Println("running on 8080")
@@ -45,6 +46,30 @@ func main() {
 
 func index(w http.ResponseWriter, r *http.Request) {
 	templates.ExecuteTemplate(w, "index.templ.html", nil)
+}
+
+func friendConnectFunc(gs gamestate.GameStateSingleton) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		err := r.ParseForm()
+		if err != nil {
+			return
+		}
+		gameID := r.FormValue("friendCode")
+		res := make(chan gamestate.GameResponse)
+		gs.FriendJoinRequests <- gamestate.FriendJoinRequest{
+			Res: res,
+			ID:  gameID,
+		}
+		result := <-res
+		if result.Error != nil {
+			//do something with this error
+			return
+		}
+		err = templates.ExecuteTemplate(w, "pong.templ.html", result)
+		if err != nil {
+			fmt.Println("error from template:", err.Error())
+		}
+	}
 }
 
 func openFriendRoomFunc(gs gamestate.GameStateSingleton) func(w http.ResponseWriter, r *http.Request) {
@@ -81,7 +106,6 @@ func startMatchMakingFunc(gs gamestate.GameStateSingleton) func(w http.ResponseW
 
 func matchMakingWaiting(gs gamestate.GameStateSingleton) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-
 		Res := make(chan gamestate.GameResponse)
 		gs.GameUpdateRequests <- gamestate.GameUpdateRequest{
 			Res:      Res,
@@ -89,9 +113,12 @@ func matchMakingWaiting(gs gamestate.GameStateSingleton) func(w http.ResponseWri
 			PlayerID: r.PathValue("player"),
 		}
 		ng := <-Res
+		if ng.Error == gamestate.ErrNOTREADYYET {
+			w.WriteHeader(http.StatusTooEarly)
+		}
 		err := templates.ExecuteTemplate(w, "pong.templ.html", ng)
 		if err != nil {
-			fmt.Println("error from template:", err.Error())
+			fmt.Println("err from template:", err.Error())
 		}
 	}
 }

@@ -24,12 +24,14 @@
 
 </div>
 {{ else }}
-<span hx-trigger="every 100ms" hx-get="/pong/{{.G.ID}}/{{.PlayerID}}" hx-target="body"></span>
+<span hx-trigger="every 1s" hx-swap="innerHTML settle:100ms" hx-get="/pong/{{.G.ID}}/{{.PlayerID}}"
+	hx-target=".everything"></span>
 <p>
 	Waiting for another player
 	{{ if .UsingFriendCode }}
 	<br></br>
 	Please tell your friend to enter the code
-<p> {{.G.ID}} </p>
+<p> {{.G.ID}}</p>
 {{ end }}
+<button hx-target=".everything" hx-get"/cancel/{{.G.ID}}">Cancel Matchmaking</button>
 </p {{ end }}

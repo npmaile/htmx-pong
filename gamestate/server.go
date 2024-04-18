@@ -2,8 +2,8 @@ package gamestate
 
 import (
 	"errors"
-
-	"github.com/google/uuid"
+	"math/rand"
+	"strings"
 )
 
 type GameStateSingleton struct {
@@ -62,23 +62,17 @@ type GameUpdateRequest struct {
 	A        Action
 }
 
+var ErrNOTREADYYET = errors.New("still waiting")
+
 func (gss *GameStateSingleton) StartProcessing() {
 	for {
 		select {
 		case req := <-gss.NewMatchMakingRequests:
 			if gss.matchMakingWaitingRoom == nil {
-				idStruct, err := uuid.NewV6()
-				if err != nil {
-					panic(err)
-				}
-				gameID := idStruct.String()
+				gameID := uuid()
 				g := NewGame(gameID)
 				gss.games[gameID] = g
-				leftPlayerID, err := uuid.NewV6()
-				if err != nil {
-					panic(err)
-				}
-				g.LeftPlayerID = leftPlayerID.String()
+				g.LeftPlayerID = uuid()
 				req.Res <- GameResponse{
 					G:        *g,
 					Ready:    false,
@@ -86,11 +80,8 @@ func (gss *GameStateSingleton) StartProcessing() {
 				}
 				gss.matchMakingWaitingRoom = g
 			} else {
-				rightPlayerID, err := uuid.NewV6()
-				if err != nil {
-					panic(err)
-				}
-				rightPlayerIDString := rightPlayerID.String()
+				rightPlayerID := uuid()
+				rightPlayerIDString := rightPlayerID
 				gss.matchMakingWaitingRoom.RightPlayerID = rightPlayerIDString
 				gss.matchMakingWaitingRoom.start()
 				req.Res <- GameResponse{
@@ -102,18 +93,11 @@ func (gss *GameStateSingleton) StartProcessing() {
 			}
 		case req := <-gss.NewWaitingRoomRequests:
 			{
-				idStruct, err := uuid.NewV6()
-				if err != nil {
-					panic(err)
-				}
-				gameID := idStruct.String()
+				idStruct := uuid()
+				gameID := idStruct
 				g := NewGame(gameID)
 				gss.games[gameID] = g
-				leftPlayerID, err := uuid.NewV6()
-				if err != nil {
-					panic(err)
-				}
-				g.LeftPlayerID = leftPlayerID.String()
+				g.LeftPlayerID = uuid()
 				req.Res <- GameResponse{
 					G:               *g,
 					Ready:           false,
@@ -137,15 +121,11 @@ func (gss *GameStateSingleton) StartProcessing() {
 					goto end
 				}
 
-				rightPlayerID, err := uuid.NewV6()
-				if err != nil {
-					panic(err)
-				}
-				rightPlayerIDString := rightPlayerID.String()
+				rightPlayerIDString := uuid()
 				g.RightPlayerID = rightPlayerIDString
 				g.start()
 				req.Res <- GameResponse{
-					G:        *gss.matchMakingWaitingRoom,
+					G:        *g,
 					Ready:    true,
 					PlayerID: rightPlayerIDString,
 				}
@@ -202,7 +182,7 @@ func (gss *GameStateSingleton) StartProcessing() {
 
 					}
 					req.Res <- GameResponse{
-						Error:           nil,
+						Error:           ErrNOTREADYYET,
 						PlayerID:        req.PlayerID,
 						G:               *g,
 						Ready:           false,
@@ -225,4 +205,51 @@ func (gss *GameStateSingleton) StartProcessing() {
 		}
 	end:
 	}
+}
+
+var uuidalphabet []string = []string{
+	"a",
+	"b",
+	"c",
+	"d",
+	"e",
+	"f",
+	"g",
+	"h",
+	"i",
+	"j",
+	"k",
+	"m",
+	"n",
+	"p",
+	"q",
+	"r",
+	"s",
+	"t",
+	"u",
+	"v",
+	"w",
+	"x",
+	"y",
+	"z",
+	"2",
+	"3",
+	"4",
+	"5",
+	"6",
+	"7",
+	"8",
+	"9",
+}
+
+const lenUUID = 6
+
+func uuid() string {
+	ret := []string{}
+	for i := 0; i < lenUUID; i++ {
+		index := rand.Intn(len(uuidalphabet))
+		ret = append(ret, uuidalphabet[index])
+	}
+
+	return strings.Join(ret, "")
 }
