@@ -36,16 +36,43 @@ func main() {
 	http.HandleFunc("/pong/{id}/{player}", matchMakingWaiting(gs))
 	http.HandleFunc("/matchmaking", startMatchMakingFunc(gs))
 	http.HandleFunc("/friendroom", openFriendRoomFunc(gs))
+	http.HandleFunc("/cancel/{id}", cancelMatchMakingFunc(gs))
 	http.HandleFunc("/update/no-action/{id}/{player}", updateFunc(gs, gamestate.NoAction))
 	http.HandleFunc("/friendConnect", friendConnectFunc(gs))
 	http.HandleFunc("/update/up/{id}/{player}", updateFunc(gs, gamestate.Up))
 	http.HandleFunc("/update/down/{id}/{player}", updateFunc(gs, gamestate.Down))
+	http.HandleFunc("/singlePlayer", singlePlayerFunc(gs))
 	fmt.Println("running on 8080")
 	http.ListenAndServe(":8080", nil)
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
 	templates.ExecuteTemplate(w, "index.templ.html", nil)
+}
+
+func singlePlayerFunc(gs gamestate.GameStateSingleton) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		res := make(chan gamestate.GameResponse)
+		gs.SinglePlayerRequests <- gamestate.SinglePlayerRequest{
+			Res: res,
+		}
+		result := <-res
+		err := templates.ExecuteTemplate(w, "pong.templ.html", result)
+		if err != nil {
+			fmt.Println("error from template:", err.Error())
+		}
+
+	}
+}
+
+func cancelMatchMakingFunc(gs gamestate.GameStateSingleton) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		gameID := r.PathValue("id")
+		gs.CancelRequests <- gamestate.CancelRequest{
+			ID: gameID,
+		}
+		index(w, r)
+	}
 }
 
 func friendConnectFunc(gs gamestate.GameStateSingleton) func(w http.ResponseWriter, r *http.Request) {

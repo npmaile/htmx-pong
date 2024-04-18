@@ -148,7 +148,9 @@ func (g *Game) play(action Action, playerID string) error {
 		}
 	}
 	g.Updated = time.Now()
-
+	if g.RightPlayerID == "ROBOT"{
+		g.PaddR.Y = g.Ball.Loc.Y
+	}
 	return nil
 }
 

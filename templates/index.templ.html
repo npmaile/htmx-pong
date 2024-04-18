@@ -109,13 +109,17 @@
 			hello, and welcome to htmx pong! if you want to play with a friend, please press
 			<button hx-target=".everything" hx-on="click" hx-get="/friendroom">here</button>
 			If you have a gameID, please enter it here:
-		<form hx-target=".everything" hx-trigger="submit" hx-include="[name=friendCode]" hx-post="/friendConnect">
+		<form hx-target=".everything" hx-trigger="submit" hx-include="[name=friendCode]"
+			hx-post="/friendConnect">
 			<label for="friendCode">Friend Code:</label>
 			<input type="text" id="friendCode" name="friendCode">
 			<button type="submit">Submit</button>
 		</form>
 		If you want to leave it up to matchmaking, please press
 		<button hx-target=".everything" hx-on="click" hx-get="/matchmaking">here</button>
+
+		<button hx-target=".everything" hx-on="click" hx-get="/singlePlayer"> single player mode (if you have no
+			friends)😞</button>
 		</p>
 	</div>
 </body>

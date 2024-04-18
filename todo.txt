@@ -1,5 +1,5 @@
 - single player mode
-- exit matchmaking waiting
 - nice landing page
 - mobile controls
 - end condition
+- fix constant refresh locks up div

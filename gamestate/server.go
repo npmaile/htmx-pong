@@ -15,6 +15,8 @@ type GameStateSingleton struct {
 	NewWaitingRoomRequests chan WaitingRoomRequest
 	FriendJoinRequests     chan FriendJoinRequest
 	GameUpdateRequests     chan GameUpdateRequest
+	CancelRequests         chan CancelRequest
+	SinglePlayerRequests   chan SinglePlayerRequest
 }
 
 func Init() GameStateSingleton {
@@ -26,7 +28,17 @@ func Init() GameStateSingleton {
 		NewWaitingRoomRequests: make(chan WaitingRoomRequest),
 		FriendJoinRequests:     make(chan FriendJoinRequest),
 		GameUpdateRequests:     make(chan GameUpdateRequest),
+		CancelRequests:         make(chan CancelRequest),
+		SinglePlayerRequests: make(chan SinglePlayerRequest),
 	}
+}
+
+type SinglePlayerRequest struct {
+	Res chan GameResponse
+}
+
+type CancelRequest struct {
+	ID string
 }
 
 type MatchMakingRequest struct {
@@ -67,6 +79,34 @@ var ErrNOTREADYYET = errors.New("still waiting")
 func (gss *GameStateSingleton) StartProcessing() {
 	for {
 		select {
+		case req := <-gss.SinglePlayerRequests:
+			{
+				playerID := uuid()
+				gameID := uuid()
+				g := NewGame(gameID)
+				g.LeftPlayerID = playerID
+				g.RightPlayerID = "ROBOT"
+				gss.games[gameID] = g
+				g.start()
+				g.LeftPlayerID = playerID
+				req.Res <- GameResponse{
+					Error:    nil,
+					PlayerID: playerID,
+					G:        *g,
+					Ready:    true,
+				}
+			}
+		case req := <-gss.CancelRequests:
+			{
+				if gss.matchMakingWaitingRoom != nil && gss.matchMakingWaitingRoom.ID == req.ID {
+					gss.matchMakingWaitingRoom = nil
+				}
+				_, ok := gss.games[req.ID]
+				if !ok {
+					goto end
+				}
+				delete(gss.games, req.ID)
+			}
 		case req := <-gss.NewMatchMakingRequests:
 			if gss.matchMakingWaitingRoom == nil {
 				gameID := uuid()
