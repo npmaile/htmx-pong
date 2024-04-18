@@ -1,4 +1,3 @@
-- single player mode
 - nice landing page
 - mobile controls
 - end condition
