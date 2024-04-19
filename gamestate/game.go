@@ -8,6 +8,8 @@ import (
 
 const inputScaling float64 = 4.0
 const timeScaling float64 = 0.00000001
+const speedupDuringGameConstant float64 = 0.1
+const score2win int = 1
 
 type vec2 struct {
 	X float64
@@ -26,16 +28,17 @@ type paddle struct {
 }
 
 type Game struct {
-	Updated       time.Time
-	Ball          *ballstate
-	PaddR         *paddle
-	Paddl         *paddle
-	ID            string
-	LeftPlayerID  string
-	RightPlayerID string
-	ScoreL        int
-	ScoreR        int
-	GameState     state
+	Updated        time.Time
+	Ball           *ballstate
+	PaddR          *paddle
+	Paddl          *paddle
+	ID             string
+	LeftPlayerID   string
+	RightPlayerID  string
+	ScoreL         int
+	ScoreR         int
+	GameState      state
+	MatchStartTime time.Time
 }
 
 type state int
@@ -116,8 +119,9 @@ func (g *Game) play(action Action, playerID string) error {
 	default:
 	}
 
+	timeInMatchScaling := 1.0 + (time.Since(g.MatchStartTime).Seconds() * speedupDuringGameConstant)
 	// move balls
-	delta := float64(time.Since(g.Updated)) * timeScaling
+	delta := float64(time.Since(g.Updated)) * timeScaling * timeInMatchScaling
 	g.Ball.Loc.X += g.Ball.Speed.X * delta
 	g.Ball.Loc.Y += g.Ball.Speed.Y * delta
 
@@ -151,11 +155,11 @@ func (g *Game) play(action Action, playerID string) error {
 	if g.RightPlayerID == "ROBOT" {
 		g.PaddR.Y = g.Ball.Loc.Y
 	}
-	if g.ScoreR > 10 {
+	if g.ScoreR > score2win {
 		g.GameState = RIGHT_WIN
 	}
 
-	if g.ScoreL > 10 {
+	if g.ScoreL > score2win {
 		g.GameState = LEFT_WIN
 	}
 	return nil
@@ -170,4 +174,5 @@ func (g *Game) resetBall(goingLeft bool) {
 	} else {
 		g.Ball.Speed.Y = -2
 	}
+	g.MatchStartTime = time.Now()
 }
