@@ -1,4 +1,4 @@
 - nice landing page
 - mobile controls
-- end condition
 - fix constant refresh locks up div
+- speed up the ball as time goes on

@@ -148,8 +148,15 @@ func (g *Game) play(action Action, playerID string) error {
 		}
 	}
 	g.Updated = time.Now()
-	if g.RightPlayerID == "ROBOT"{
+	if g.RightPlayerID == "ROBOT" {
 		g.PaddR.Y = g.Ball.Loc.Y
+	}
+	if g.ScoreR > 10 {
+		g.GameState = RIGHT_WIN
+	}
+
+	if g.ScoreL > 10 {
+		g.GameState = LEFT_WIN
 	}
 	return nil
 }

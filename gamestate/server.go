@@ -29,7 +29,7 @@ func Init() GameStateSingleton {
 		FriendJoinRequests:     make(chan FriendJoinRequest),
 		GameUpdateRequests:     make(chan GameUpdateRequest),
 		CancelRequests:         make(chan CancelRequest),
-		SinglePlayerRequests: make(chan SinglePlayerRequest),
+		SinglePlayerRequests:   make(chan SinglePlayerRequest),
 	}
 }
 
@@ -60,6 +60,7 @@ type GameResponse struct {
 	G               Game
 	Ready           bool
 	UsingFriendCode bool
+	Message         string
 }
 
 type FriendJoinResponse struct {
@@ -236,11 +237,27 @@ func (gss *GameStateSingleton) StartProcessing() {
 				}
 			}
 			g.play(req.A, req.PlayerID)
+			message := ""
+			switch g.GameState {
+			case RIGHT_WIN:
+				if req.PlayerID == g.RightPlayerID {
+					message = "YOU WIN!"
+				} else {
+					message = "YOU LOSE!"
+				}
+			case LEFT_WIN:
+				if req.PlayerID == g.LeftPlayerID {
+					message = "YOU WIN! (reload the page to go again)"
+				} else {
+					message = "YOU LOSE!(reload the page to go again)"
+				}
+			}
 			req.Res <- GameResponse{
 				PlayerID: req.PlayerID,
 				G:        *g,
 				Ready:    true,
 				Error:    nil,
+				Message:  message,
 			}
 		}
 	end:

@@ -3,3 +3,4 @@
 .b{top:{{.G.Ball.Loc.Y}}%;left:{{.G.Ball.Loc.X}}%;}
 .sr::after{content:"{{.G.ScoreR}}";}
 .sl::before{content:"{{.G.ScoreL}}";}
+.pm::before{content:"{{.Message}}";}
