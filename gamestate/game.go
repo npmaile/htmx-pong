@@ -9,7 +9,7 @@ import (
 const inputScaling float64 = 4.0
 const timeScaling float64 = 0.00000001
 const speedupDuringGameConstant float64 = 0.1
-const score2win int = 1
+const score2win int = 10
 
 type vec2 struct {
 	X float64
