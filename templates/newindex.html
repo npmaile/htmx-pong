@@ -2,212 +2,243 @@
 <html lang="en">
 
 <head>
-	<script src="./static/htmx.js"></script>
-	<meta property="og:type" content="website">
-	<meta property="og:title" content="the greatest pong ever">
-	<meta property="og:description"
-		content="within this page you will experience the greatness brought into this world by the dynamic duo of nathaniel p maile and some other guy">
-	<style>
-		:root {
-			color-scheme: light dark;
-		}
+    <script src="./static/htmx.js"></script>
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="the greatest pong ever">
+    <meta property="og:description"
+        content="within this page you will experience the greatness brought into this world by the dynamic duo of nathaniel p maile and some other guy">
+    <style>
+        :root {
+            color-scheme: light dark;
+        }
 
-		@media (prefers-color-scheme: dark) {
-			.gameObject {
-				background-color: white;
-			}
+        @media (prefers-color-scheme: dark) {
+            .gameObject {
+                background-color: white;
+            }
 
-			.scoreLeft {
-				color: white;
-			}
-		}
+            .scoreLeft {
+                color: white;
+            }
+        }
 
-		@media (prefers-color-scheme: light) {
-			.gameObject {
-				background-color: black;
-			}
+        @media (prefers-color-scheme: light) {
+            .gameObject {
+                background-color: black;
+            }
 
-			.scoreRight {
-				color: white;
-			}
+            .scoreRight {
+                color: white;
+            }
 
-		}
+        }
 
-		body {
-			padding: 0px;
-			margin: 0px;
-		}
+        body {
+            padding: 0px;
+            margin: 0px;
+            height: 100vh;
+            /* ensure the body takes up the entire view height */
+        }
 
-		span {
-			position: absolute;
-			width: 100%;
-			height: 100%;
-		}
+        span {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
 
-		.screen {
-			position: fixed;
-			width: 100%;
-			height: 100%;
-			min-width: 100%;
-			min-height: 100%;
-		}
+        .screen {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            min-width: 100%;
+            min-height: 100%;
+        }
 
-		.Paddle {
-			width: 5%;
-			height: 25%;
-		}
+        .Paddle {
+            width: 5%;
+            height: 25%;
+        }
 
-		.paddL {
-			position: absolute;
-			transform: translateY(-50%);
-			left: 0px;
-		}
+        .paddL {
+            position: absolute;
+            transform: translateY(-50%);
+            left: 0px;
+        }
 
-		.paddR {
-			position: absolute;
-			transform: translateY(-50%);
-			right: 0px;
-			/*💕*/
-		}
+        .paddR {
+            position: absolute;
+            transform: translateY(-50%);
+            right: 0px;
+            /*💕*/
+        }
 
-		.Ball {
-			position: absolute;
-			transform: translateY(-50%)translateX(-50%);
-			width: 5%;
-			height: 5%;
-		}
+        .Ball {
+            position: absolute;
+            transform: translateY(-50%)translateX(-50%);
+            width: 5%;
+            height: 5%;
+        }
 
-		.divider {
-			position: absolute;
-			width: 1%;
-			height: 100%;
-			left: 49.5%;
-		}
+        .divider {
+            position: absolute;
+            width: 1%;
+            height: 100%;
+            left: 49.5%;
+        }
 
-		.scoreLeft {
-			position: absolute;
-			width: 18%;
-			height: 18%;
-			left: 25%;
+        .scoreLeft {
+            position: absolute;
+            width: 18%;
+            height: 18%;
+            left: 25%;
 
-		}
+        }
 
-		.scoreRight {
-			position: absolute;
-			width: 18%;
-			height: 18%;
-			right: 25%;
-		}
+        .scoreRight {
+            position: absolute;
+            width: 18%;
+            height: 18%;
+            right: 25%;
+        }
 
-		.playerMessage {
-			position: absolute;
-			width: 100%;
-			height: 100%;
-			font-size: 15vw;
-		}
+        .playerMessage {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            font-size: 15vw;
+        }
 
-		.endsWithHtmx::after {
-			content: "</>"
-		}
+        .endsWithHtmx::after {
+            content: "</>"
+        }
 
-		.endsWithHtmx::before {
-			content: "</>"
-		}
+        .endsWithHtmx::before {
+            content: "</>"
+        }
 
-		.flexbox {
-			display: flex;
-			width: 100%;
-			margin: 0;
-			text-align: center;
-			font-size: 2em;
-		}
+        .flexbox {
+            display: flex;
+            width: 100%;
+            margin: 0;
+            text-align: center;
+            font-size: 2em;
+        }
 
-		.toppart {
-			width: 100%;
-		}
+        /* 
+           .everything needs to be the entire size of the body 
+           - can move these to body if you don't need the .everything div for anything else
+        */
+        .everything {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
 
-		.bottom_section_zone {
-			display: flex;
-			flex-direction: row;
-			width: 80%;
-			margin-left: auto;
-			margin-right: auto;
-			justify-content: center;
+        .toppart {
+            width: 100%;
+        }
 
-			align-items: center;
-		}
+        .bottom_section_zone {
+            display: flex;
+            flex-direction: row;
+            justify-content: center;
+            align-items: center;
+            width: 80%;
+            /* top right bottom left, change as necessary */
+            margin: auto auto 10% auto;
+        }
 
-		.bottomzone {
-			width: 100%;
-			height: 100%;
-			text-align: center;
-			border: solid .2em white;
-			padding: 1em;
-			font-size: 1.4em;
-		}
-	</style>
-	<style class="game">
-	</style>
+        /* I'm assuming this is around what you want - can change easily */
+        .bottomzone {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            margin: auto;
+            height: 100%;
+            width: 100%;
+            text-align: center;
+            border: solid .2em white;
+            padding: 0.2em 1.2em 0.2em 1.2em;
+            font-size: 1.4em;
+            white-space: nowrap;
+            gap: 0.2em;
+        }
+
+        /* Freebie for when the screen width becomes < 500px -- change as necessary */
+        /* ~800px is the width of all of the boxes, but I set to 500px just in case */
+        @media (max-width: 500px) {
+            .bottom_section_zone {
+                flex-direction: column;
+                white-space: wrap;
+                width: fit-content;
+            }
+
+            .bottomzone {
+                padding: 0.5em;
+                white-space: wrap;
+            }
+        }
+
+        .friend_code {
+            display: flex;
+            flex-direction: column;
+            gap: 0.2em;
+        }
+    </style>
+    <style class="game">
+    </style>
 </head>
 
 <body>
-	<div class="everything">
-		<div class="flexbox">
-			<div id="col1" class="toppart">
-				<div class="endsWithHtmx">
-					<a href="https://htmx.org"> htmx</a>
-				</div>
-				<div class="endsWithHtmx">
-					<a href="https://github.com/deastl/flappybird-htmx"> htmx flappybird</a>
-				</div>
-				<div class="endsWithHtmx">
-					<a href="https://github.com/deastl/htmx-agario">htmx agario</a>
-				</div>
+    <div class="everything">
+        <div class="flexbox">
+            <div id="col1" class="toppart">
+                <div class="endsWithHtmx">
+                    <a href="https://htmx.org"> htmx</a>
+                </div>
+                <div class="endsWithHtmx">
+                    <a href="https://github.com/deastl/flappybird-htmx"> htmx flappybird</a>
+                </div>
+                <div class="endsWithHtmx">
+                    <a href="https://github.com/deastl/htmx-agario">htmx agario</a>
+                </div>
+            </div>
 
-			</div>
-			<div id="col2" class="toppart">
-				<div>
-					Nate Stream Productions Presents:
-				</div>
-				<div>
-					HTMX PONG
-				</div>
-			</div>
-			<div id="col3" class="toppart">
-			</div>
-		</div>
-		<div class="bottom_section_zone">
-			<div class="bottomzone">
-				1p
-			</div>
-			<div class="bottomzone">
-				2p
-			</div>
-			<div class="bottomzone">
-				2p (with friends)
-			</div>
-			<div class="bottomzone">
-				enter friend code
-			</div>
-		</div>
-		<p>
-			hello, and welcome to htmx pong! if you want to play with a friend, please press
-			<button hx-target=".everything" hx-on="click" hx-get="/friendroom">here</button>
-			If you have a gameID, please enter it here:
-		<form hx-target=".everything" hx-trigger="submit" hx-include="[name=friendCode]"
-			hx-post="/friendConnect">
-			<label for="friendCode">Friend Code:</label>
-			<input type="text" id="friendCode" name="friendCode">
-			<button type="submit">Submit</button>
-		</form>
-		If you want to leave it up to matchmaking, please press
-		<button hx-target=".everything" hx-on="click" hx-get="/matchmaking">here</button>
+            <div id="col2" class="toppart">
+                <div>
+                    Nate Stream Productions Presents:
+                </div>
+                <div>
+                    HTMX PONG
+                </div>
+            </div>
+            <div id="col3" class="toppart">
+            </div>
+        </div>
 
-		<button hx-target=".everything" hx-on="click" hx-get="/singlePlayer"> single player mode (if you
-			have no
-			friends)😞</button>
-		</p>
-	</div>
+        <div class="bottom_section_zone">
+            <div class="bottomzone">
+                1p
+                <button hx-target=".everything" hx-on="click" hx-get="/singlePlayer"> Friendless Heathen😞</button>
+            </div>
+            <div class="bottomzone">
+                2p
+                <button hx-target=".everything" hx-on="click" hx-get="/matchmaking">Random Matchmaking</button>
+            </div>
+            <div class="bottomzone">
+                2p (with friends)
+                <button hx-target=".everything" hx-on="click" hx-get="/friendroom">Don't trust N8</button>
+            </div>
+            <div class="bottomzone">
+                <form class="friend_code" hx-target=".everything" hx-trigger="submit" hx-include="[name=friendCode]"
+                    hx-post="/friendConnect">
+                    <label for="friendCode">Friend Code</label>
+                    <input type="text" id="friendCode" name="friendCode">
+                    <button type="submit">Submit</button>
+                </form>
+            </div>
+        </div>
+    </div>
 </body>
 
 </html>
