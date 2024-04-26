@@ -33,9 +33,14 @@
 
 		}
 
+		html {
+			height: 100%;
+		}
+
 		body {
 			padding: 0px;
 			margin: 0px;
+			height: 100vh;
 		}
 
 		span {
@@ -130,20 +135,21 @@
 			display: flex;
 			flex-direction: row;
 			width: 80%;
-			margin-left: auto;
-			margin-right: auto;
-			justify-content: center;
-
+			margin: 0 auto;
 			align-items: center;
+			position: fixed;
+			bottom: 0;
+
 		}
 
 		.bottomzone {
 			width: 100%;
-			height: 100%;
 			text-align: center;
 			border: solid .2em white;
 			padding: 1em;
 			font-size: 1.4em;
+			align-content: space-around;
+			height: 2em;
 		}
 	</style>
 	<style class="game">
@@ -151,7 +157,7 @@
 </head>
 
 <body>
-	<div class="everything">
+	<div class="screen">
 		<div class="flexbox">
 			<div id="col1" class="toppart">
 				<div class="endsWithHtmx">
@@ -177,36 +183,24 @@
 			</div>
 		</div>
 		<div class="bottom_section_zone">
-			<div class="bottomzone">
+			<div class="bottomzone" hx-target=".everything" hx-on="click" hx-get="/singlePlayer">
 				1p
 			</div>
-			<div class="bottomzone">
+			<div class="bottomzone" hx-target=".everything" hx-on="click" hx-get="/matchmaking">
 				2p
 			</div>
-			<div class="bottomzone">
+			<div class="bottomzone" hx-target=".everything" hx-on="click" hx-get="/friendroom">
 				2p (with friends)
 			</div>
 			<div class="bottomzone">
-				enter friend code
+				<form hx-target=".everything" hx-trigger="submit" hx-include="[name=friendCode]"
+					hx-post="/friendConnect">
+					<label for="friendCode">Friend Code:</label>
+					<input type="text" id="friendCode" name="friendCode">
+					<button type="submit">Submit</button>
+				</form>
 			</div>
 		</div>
-		<p>
-			hello, and welcome to htmx pong! if you want to play with a friend, please press
-			<button hx-target=".everything" hx-on="click" hx-get="/friendroom">here</button>
-			If you have a gameID, please enter it here:
-		<form hx-target=".everything" hx-trigger="submit" hx-include="[name=friendCode]"
-			hx-post="/friendConnect">
-			<label for="friendCode">Friend Code:</label>
-			<input type="text" id="friendCode" name="friendCode">
-			<button type="submit">Submit</button>
-		</form>
-		If you want to leave it up to matchmaking, please press
-		<button hx-target=".everything" hx-on="click" hx-get="/matchmaking">here</button>
-
-		<button hx-target=".everything" hx-on="click" hx-get="/singlePlayer"> single player mode (if you
-			have no
-			friends)😞</button>
-		</p>
 	</div>
 </body>
 

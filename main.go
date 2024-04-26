@@ -47,7 +47,7 @@ func main() {
 }
 
 func index(w http.ResponseWriter, r *http.Request) {
-	templates.ExecuteTemplate(w, "index.templ.html", nil)
+	templates.ExecuteTemplate(w, "newindex.html", nil)
 }
 
 func singlePlayerFunc(gs gamestate.GameStateSingleton) func(w http.ResponseWriter, r *http.Request) {
