@@ -119,16 +119,26 @@
 			content: "</>"
 		}
 
-		.flexbox {
+		.blexfox {
 			display: flex;
 			width: 100%;
 			margin: 0;
 			text-align: center;
 			font-size: 2em;
+			height: 80%;
+			align-items: center;
 		}
 
 		.toppart {
 			width: 100%;
+			height: 100%;
+
+		}
+
+		#col1 {
+			display: flex;
+			flex-direction: column;
+			justify-content: space-around;
 		}
 
 		.bottom_section_zone {
@@ -137,8 +147,8 @@
 			width: 80%;
 			margin: 0 auto;
 			align-items: center;
-			position: fixed;
-			bottom: 0;
+			position: relative;
+			/*top: 70%;*/
 
 		}
 
@@ -151,6 +161,25 @@
 			align-content: space-around;
 			height: 2em;
 		}
+
+		.makeitflex {
+			height: 100%;
+			display: flex;
+			flex-direction: column;
+			justify-content: space-between;
+		}
+
+		.header_text {
+			margin-top: 1em;
+			text-align: center;
+			font-size: 2em;
+		}
+		#col2{
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			font-size: 5em;
+		}
 	</style>
 	<style class="game">
 	</style>
@@ -158,47 +187,47 @@
 
 <body>
 	<div class="screen">
-		<div class="flexbox">
-			<div id="col1" class="toppart">
-				<div class="endsWithHtmx">
-					<a href="https://htmx.org"> htmx</a>
-				</div>
-				<div class="endsWithHtmx">
-					<a href="https://github.com/deastl/flappybird-htmx"> htmx flappybird</a>
-				</div>
-				<div class="endsWithHtmx">
-					<a href="https://github.com/deastl/htmx-agario">htmx agario</a>
-				</div>
-
+		<div class="makeitflex">
+			<div class="header_text">
+				Nate Stream Productions Presents:
 			</div>
-			<div id="col2" class="toppart">
-				<div>
-					Nate Stream Productions Presents:
+			<div class="blexfox">
+				<div id="col1" class="toppart">
+					<div class="endsWithHtmx">
+						<a href="https://htmx.org"> htmx</a>
+					</div>
+					<div class="endsWithHtmx">
+						<a href="https://github.com/deastl/flappybird-htmx"> htmx flappybird</a>
+					</div>
+					<div class="endsWithHtmx">
+						<a href="https://github.com/deastl/htmx-agario">htmx agario</a>
+					</div>
+
 				</div>
-				<div>
+				<div id="col2" class="toppart">
 					HTMX PONG
 				</div>
+				<div id="col3" class="toppart">
+				</div>
 			</div>
-			<div id="col3" class="toppart">
-			</div>
-		</div>
-		<div class="bottom_section_zone">
-			<div class="bottomzone" hx-target=".everything" hx-on="click" hx-get="/singlePlayer">
-				1p
-			</div>
-			<div class="bottomzone" hx-target=".everything" hx-on="click" hx-get="/matchmaking">
-				2p
-			</div>
-			<div class="bottomzone" hx-target=".everything" hx-on="click" hx-get="/friendroom">
-				2p (with friends)
-			</div>
-			<div class="bottomzone">
-				<form hx-target=".everything" hx-trigger="submit" hx-include="[name=friendCode]"
-					hx-post="/friendConnect">
-					<label for="friendCode">Friend Code:</label>
-					<input type="text" id="friendCode" name="friendCode">
-					<button type="submit">Submit</button>
-				</form>
+			<div class="bottom_section_zone">
+				<div class="bottomzone" hx-target=".screen" hx-on="click" hx-get="/singlePlayer">
+					1p
+				</div>
+				<div class="bottomzone" hx-target=".screen" hx-on="click" hx-get="/matchmaking">
+					2p
+				</div>
+				<div class="bottomzone" hx-target=".screen" hx-on="click" hx-get="/friendroom">
+					2p (with friends)
+				</div>
+				<div class="bottomzone">
+					<form hx-target=".screen" hx-trigger="submit" hx-include="[name=friendCode]"
+						hx-post="/friendConnect">
+						<label for="friendCode">Friend Code:</label>
+						<input type="text" id="friendCode" name="friendCode">
+						<button type="submit">Submit</button>
+					</form>
+				</div>
 			</div>
 		</div>
 	</div>
