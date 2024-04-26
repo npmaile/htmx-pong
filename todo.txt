@@ -1,3 +1,1 @@
-- nice landing page
-- mobile controls
 - fix constant refresh locks up div

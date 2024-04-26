@@ -150,7 +150,7 @@ func (g *Game) play(action Action, playerID string) error {
 			g.ScoreL += 1
 			g.resetBall(true)
 		}
-	}
+}
 	g.Updated = time.Now()
 	if g.RightPlayerID == "ROBOT" {
 		g.PaddR.Y = g.Ball.Loc.Y
