@@ -129,10 +129,8 @@ func (g *Game) play(action Action, playerID string) error {
 	switch action {
 	case Up:
 		targetPaddle.Dir = UP
-
 	case Down:
 		targetPaddle.Dir = DOWN
-
 	case NotUp:
 		targetPaddle.Dir = NEUTRAL
 	case NotDown:
@@ -156,9 +154,9 @@ func (g *Game) play(action Action, playerID string) error {
 
 	switch g.PaddR.Dir {
 	case UP:
-		g.PaddR.Y -= 1 * inputScaling * delta * .001
+		g.PaddR.Y -= 1 * inputScaling * delta
 	case DOWN:
-		g.PaddR.Y += 1 * inputScaling * delta * .001
+		g.PaddR.Y += 1 * inputScaling * delta
 	}
 
 	// calculate ceiling/floor collisions

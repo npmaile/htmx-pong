@@ -27,7 +27,7 @@
 </div>
 {{ else }}
 <span hx-trigger="every 1s" hx-swap="innerHTML settle:100ms" hx-get="/pong/{{.G.ID}}/{{.PlayerID}}"
-	hx-target=".everything"></span>
+	hx-target=".screen"></span>
 <p>
 	Waiting for another player
 	{{ if .UsingFriendCode }}

@@ -55,12 +55,12 @@ type FriendJoinRequest struct {
 }
 
 type GameResponse struct {
+	G               Game
 	Error           error
 	PlayerID        string
-	G               Game
+	Message         string
 	Ready           bool
 	UsingFriendCode bool
-	Message         string
 }
 
 type FriendJoinResponse struct {
