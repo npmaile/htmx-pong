@@ -168,6 +168,19 @@ func (g *Game) play(action Action, playerID string) error {
 		g.Ball.Speed.Y *= -1
 	}
 
+	if g.Paddl.Y >= 100{
+		g.Paddl.Y = 100
+	}
+	if g.Paddl.Y <= 0{
+		g.Paddl.Y = 0
+	}
+
+	if g.PaddR.Y >= 100{
+		g.PaddR.Y = 100
+	}
+	if g.PaddR.Y <= 0{
+		g.PaddR.Y = 0
+	}
 	// calculate paddle collision left
 	if g.Ball.Loc.X <= 7 && g.Ball.Speed.X < 0 {
 		if math.Abs(g.Ball.Loc.Y-g.Paddl.Y) < g.Paddl.Height/2 && g.Ball.Speed.X < 0 {
