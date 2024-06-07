@@ -1,12 +1,13 @@
 {{ if .Ready}}
-<span hx-trigger="keypress[key=='w'] from:body queue:first" hx-get="/update/up/{{.G.ID}}/{{.PlayerID}}"
+<span hx-trigger="keydown[keyCode==38] from:body queue:first" hx-get="/update/up/{{.G.ID}}/{{.PlayerID}}"
 	hx-target=".game"></span>
-<span hx-trigger="keypress[key=='s'] from:body queue:first" hx-get="/update/down/{{.G.ID}}/{{.PlayerID}}"
+<span hx-trigger="keydown[keyCode==40] from:body queue:first" hx-get="/update/down/{{.G.ID}}/{{.PlayerID}}"
 	hx-target=".game"></span>
-<span hx-trigger="keypress[key=='i'] from:body queue:first" hx-get="/update/up/{{.G.ID}}/{{.PlayerID}}"
+<span hx-trigger="keyup[keyCode==38] from:body queue:first" hx-get="/update/notup/{{.G.ID}}/{{.PlayerID}}"
 	hx-target=".game"></span>
-<span hx-trigger="keypress[key=='k'] from:body queue:first" hx-get="/update/down/{{.G.ID}}/{{.PlayerID}}"
+<span hx-trigger="keyup[keyCode==40] from:body queue:first" hx-get="/update/notdown/{{.G.ID}}/{{.PlayerID}}"
 	hx-target=".game"></span>
+
 <span hx-trigger="every 1ms" hx-get="/update/no-action/{{.G.ID}}/{{.PlayerID}}" hx-target=".game"></span>
 <div class="screen">
 	<div class="gameObject paddL l Paddle">

@@ -41,6 +41,9 @@ func main() {
 	http.HandleFunc("/friendConnect", friendConnectFunc(gs))
 	http.HandleFunc("/update/up/{id}/{player}", updateFunc(gs, gamestate.Up))
 	http.HandleFunc("/update/down/{id}/{player}", updateFunc(gs, gamestate.Down))
+	http.HandleFunc("/update/notup/{id}/{player}", updateFunc(gs, gamestate.NotUp))
+	http.HandleFunc("/update/notdown/{id}/{player}", updateFunc(gs, gamestate.NotDown))
+
 	http.HandleFunc("/singlePlayer", singlePlayerFunc(gs))
 	fmt.Println("running on 8080")
 	http.ListenAndServe(":8080", nil)

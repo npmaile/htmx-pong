@@ -9,7 +9,7 @@ import (
 const inputScaling float64 = 4.0
 const timeScaling float64 = 0.00000001
 const speedupDuringGameConstant float64 = 0.1
-const score2win int = 10
+const score2win int = 5
 
 type vec2 struct {
 	X float64
@@ -25,7 +25,16 @@ type paddle struct {
 	Height float64
 	Y      float64
 	Left   bool
+	Dir    direction
 }
+
+type direction int
+
+const (
+	UP direction = iota
+	DOWN
+	NEUTRAL
+)
 
 type Game struct {
 	Updated        time.Time
@@ -62,12 +71,16 @@ func NewGame(ID string) *Game {
 			Height: 25,
 			Y:      50,
 			Left:   true,
+			Dir:    NEUTRAL,
 		},
 		PaddR: &paddle{
 			Height: 25,
 			Y:      50,
 			Left:   false,
+			Dir:    NEUTRAL,
 		},
+		ScoreL:    0,
+		ScoreR:    0,
 		Updated:   time.Now(),
 		GameState: WAITING,
 		ID:        ID,
@@ -83,6 +96,8 @@ type Action int
 const (
 	Up Action = iota
 	Down
+	NotUp
+	NotDown
 	NoAction
 )
 
@@ -113,9 +128,15 @@ func (g *Game) play(action Action, playerID string) error {
 
 	switch action {
 	case Up:
-		targetPaddle.Y -= 1 * inputScaling
+		targetPaddle.Dir = UP
+
 	case Down:
-		targetPaddle.Y += 1 * inputScaling
+		targetPaddle.Dir = DOWN
+
+	case NotUp:
+		targetPaddle.Dir = NEUTRAL
+	case NotDown:
+		targetPaddle.Dir = NEUTRAL
 	default:
 	}
 
@@ -124,6 +145,21 @@ func (g *Game) play(action Action, playerID string) error {
 	delta := float64(time.Since(g.Updated)) * timeScaling * timeInMatchScaling
 	g.Ball.Loc.X += g.Ball.Speed.X * delta
 	g.Ball.Loc.Y += g.Ball.Speed.Y * delta
+
+	// move paddles
+	switch g.Paddl.Dir {
+	case UP:
+		g.Paddl.Y -= 1 * inputScaling * delta
+	case DOWN:
+		g.Paddl.Y += 1 * inputScaling * delta
+	}
+
+	switch g.PaddR.Dir {
+	case UP:
+		g.PaddR.Y -= 1 * inputScaling * delta * .001
+	case DOWN:
+		g.PaddR.Y += 1 * inputScaling * delta * .001
+	}
 
 	// calculate ceiling/floor collisions
 	if g.Ball.Loc.Y >= 100 && g.Ball.Speed.Y > 0 {
@@ -150,7 +186,7 @@ func (g *Game) play(action Action, playerID string) error {
 			g.ScoreL += 1
 			g.resetBall(true)
 		}
-}
+	}
 	g.Updated = time.Now()
 	if g.RightPlayerID == "ROBOT" {
 		g.PaddR.Y = g.Ball.Loc.Y
